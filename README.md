@@ -77,11 +77,7 @@ pip install -r requirements.txt
 ### 3. Launch Web Application
 ```bash
 streamlit run app.py
-```
 
-Open **[http://localhost:8501](http://localhost:8501)** in your browser to access the dashboard.
-
----
 
 ## 🧪 Running Verification Tests
 
