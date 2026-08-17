@@ -3,6 +3,21 @@
 A decision-support system designed to analyze incoming aerial threat profiles, evaluate physical and operational feasibility across a countermeasure inventory, calculate synthetic neutralization probabilities ($P_k$), and recommend optimal defense choices using a cost-aware decision engine.
 
 ---
+<img width="1919" height="859" alt="image" src="https://github.com/user-attachments/assets/f6962f1c-a310-4101-94e0-003e0de14fb8" />
+
+<img width="1893" height="802" alt="image" src="https://github.com/user-attachments/assets/3a7453bd-5552-4cb5-9ae2-0b5809bced7b" />
+<img width="1896" height="866" alt="image" src="https://github.com/user-attachments/assets/6fad6f88-52e8-420c-9275-135cd3ef638c" />
+<img width="1838" height="612" alt="image" src="https://github.com/user-attachments/assets/18e04a1a-93fe-41c2-96bc-08189aafcc90" />
+
+
+## Objective
+Build a decision-support system that:
+Takes an incoming threat weapon as input (from Dataset A).
+Scores its priority/danger level using a weighted requirement matrix.
+Matches it against a counter-measure inventory (Dataset B) using engagement envelope compatibility.
+Computes a neutralization probability for each feasible counter-measure.
+Picks the best counter-measure using a cost-aware decision engine — cheaper options win only when they're "close enough" in effectiveness; effectiveness wins outright when the gap is large or when both options are in a low-confidence zone; and in the low-confidence zone the system also proposes a multi-weapon combination to raise the odds of a kill.
+
 
 ## 🛡️ Key Features
 
