@@ -1,0 +1,201 @@
+# ============================================================
+# Aerial Defense Decision-Support System — Configuration
+# ============================================================
+# All tunable parameters live here. Change values freely;
+# the code reads this file at startup, so edits take effect
+# on the next run without touching any Python code.
+# ============================================================
+
+# --- Data file paths (relative to project root) ---
+data:
+  threats_file: "data/threats.xlsx"
+  countermeasures_file: "data/countermeasures.xlsx"
+
+# --- Stage 1: Threat Priority Score (TPS) weights ---
+# Must sum to 1.0
+tps_weights:
+  speed: 0.25
+  detectability: 0.20       # inverse of altitude — low-alt = harder to detect
+  payload: 0.15
+  detection_range: 0.15     # inverse — short detection range = more dangerous
+  rf_link: 0.10             # no RF link (autonomous) = harder to counter
+  threat_class: 0.15        # severity tier lookup
+
+# --- Threat class → severity mapping (1–10 scale) ---
+threat_class_severity:
+  # Tier 10 — Strategic / hypersonic / near-impossible to intercept
+  "Hypersonic Glide": 10
+  "Hypersonic Cruise": 10
+  "Bomber": 10
+  # Tier 9 — High-end manned / hypersonic anti-ship
+  "Hypersonic Anti-Ship": 9
+  "Fighter Aircraft": 9
+  # Tier 8 — Cruise missiles (various)
+  "Cruise Missile": 8
+  "Anti-Ship Cruise": 8
+  "Air-to-Surface Cruise": 8
+  "Submarine Cruise": 8
+  "Cruise Missile (aerial target/decoy)": 8
+  "Cruise Missile (air-launched target)": 8
+  "Cruise Missile (legacy target drone)": 8
+  "Cruise Missile (aerial target)": 8
+  # Tier 7 — Anti-ship / air-to-air / SAMs
+  "Anti-Ship Missile": 7
+  "Anti-Ship/Radiation": 7
+  "Air-to-Air Missile": 7
+  "Surface-to-Air Missile": 7
+  "Man-Portable SAM": 7
+  "Air-to-Surface Missile": 7
+  # Tier 6 — UCAV / combat drones / guided weapons
+  "UCAV": 6
+  "Combat UAV": 6
+  "Combat Multirotor": 6
+  "Loitering Munition": 6
+  "Guided Bomb/Missile": 6
+  "Guided Bomb": 6
+  "Guided Shell": 6
+  "Glide Bomb": 6
+  "Cluster Bomb": 6
+  # Tier 5 — Medium UAVs / rockets
+  "MALE UAV": 5
+  "HALE UAV": 5
+  "Rocket": 5
+  "ATGM": 5
+  # Tier 4 — Surveillance / helicopters
+  "Surveillance UAV": 4
+  "Helicopter": 4
+  "Helicopter (rotary-wing UAV)": 4
+  # Tier 3 — Tactical / swarm
+  "Target Drone": 3
+  "Swarm Drone": 3
+  "FPV Drone": 3
+  # Tier 2 — Small commercial
+  "Small Commercial UAV": 2
+  "Small Commercial UAV (logistics/cargo)": 2
+  "Aerostat": 2
+  # Tier 1 — Micro
+  "Surveillance UAV (MAV)": 1
+  # Tier 5 — Torpedo (kept for completeness, filtered out of aerial)
+  "ASW Torpedo": 5
+  # Default for unmapped classes
+  default_severity: 5
+
+# --- Stage 2.2: Synthetic base_kill_probability weights ---
+# Used to derive Pk when no real column exists.
+# IMPORTANT: Range is NOT included here — it is handled by range_fit_factor.
+#            Including it here would double-count range coverage.
+# Weights MUST sum to 1.0:  0.40 + 0.35 + 0.25 = 1.00
+synthetic_pk_weights:
+  weapon_class_tier: 0.40    # class-based effectiveness tier (dominant factor)
+  speed_ratio: 0.35          # cm.max_speed / threat.max_speed
+  altitude_ratio: 0.25       # cm.max_altitude / threat.max_altitude
+
+# --- CM weapon class → base effectiveness tier (0.0–1.0) ---
+weapon_class_tier:
+  # Top-tier SAM systems
+  "Long Range SAM": 0.90
+  "MR-SAM": 0.85
+  "MR-SAM/Counter-UAS": 0.83
+  "SR-SAM": 0.80
+  "SR-SAM/Counter-UAS": 0.78
+  "SHORAD/SR-SAM": 0.75
+  "SAM Missile": 0.75
+  "Vehicle-mounted SHORAD": 0.70
+  "MANPADS": 0.65
+  "SAM - Quick Reaction": 0.78
+  "SAM - Short Range (naval)": 0.75
+  "SAM - Short Range (legacy)": 0.60
+  "Short/Medium Range Quick-Reaction SAM": 0.77
+  "Very Short Range SAM (Legacy)": 0.55
+  "MANPADS (Legacy)": 0.50
+  "Very Long Range SAM (Retired)": 0.55
+  "Long/Medium Range Naval & Land SAM": 0.85
+  "Medium Range SAM (Legacy)": 0.65
+  "Legacy SAM (Medium Range)": 0.60
+  # BMD
+  "BMD - Exo-atmospheric": 0.70
+  "BMD Interceptor - Endo-atmospheric": 0.75
+  "BMD Interceptor - Endo/Low-Exo-atmospheric": 0.72
+  "BMD Interceptor - Exo-atmospheric": 0.70
+  # Guns / CIWS
+  "AA Gun": 0.55
+  "AA Gun/SPAAG": 0.60
+  "CIWS Gun": 0.65
+  "AA Gun (HMG)": 0.45
+  "Naval Missile+Gun CIWS": 0.70
+  "Towed Anti-Aircraft Gun (Legacy)": 0.40
+  # Counter-UAS
+  "Counter-UAS": 0.70
+  "Counter-UAS (Wide-area AI)": 0.65
+  "Counter-UAS (Hard-Kill Micro-missile)": 0.72
+  "Counter-UAS (man-portable)": 0.55
+  "Counter-UAS (Naval)": 0.68
+  "Counter-UAS (Kinetic)": 0.70
+  "Counter-UAS (Kinetic, autonomous)": 0.72
+  "Counter-UAS (Non-lethal capture)": 0.50
+  "Micro-Missile Counter-Drone System": 0.70
+  "Drone-mounted Net Capture Interceptor": 0.45
+  # EW / Jammers
+  "Counter-UAS (EW)": 0.60
+  "Counter-UAS (Jammer)": 0.55
+  "RF Jammer": 0.60
+  "RF Jammer (man-portable)": 0.50
+  "RF Jammer (fixed/static)": 0.55
+  "GNSS Jammer": 0.50
+  "GNSS Spoofer": 0.50
+  "GNSS Denial Jammer": 0.50
+  "Electronic Warfare (Integrated)": 0.65
+  "Electronic Warfare (Integrated, Army)": 0.63
+  "Electronic Warfare (RF Monitoring)": 0.45
+  "RF Detection & Jamming System": 0.55
+  "Spoofing / Electronic Attack System": 0.50
+  "GPS Jammer": 0.50
+  "Spoofing System": 0.50
+  # DEW
+  "Directed Energy Weapon": 0.68
+  "Directed Energy Weapon (Naval)": 0.70
+  "Laser DEW (Hard-Kill)": 0.72
+  "Laser Weapon": 0.70
+  # Air Defence Missiles
+  "Air Defence Missile": 0.75
+  "Air Defence Missile (IR)": 0.72
+  "Air Defence Missile (Active Radar)": 0.78
+  "Air Defence Missile (MANPADS)": 0.65
+  "Air Defence Missile (repurposed A2A)": 0.68
+  # Misc (kept for matching but lower confidence)
+  "SHORAD Missile": 0.72
+  "Medium Range SAM": 0.80
+  "CIWS (Gun)": 0.65
+  "Anti-Aircraft Gun": 0.55
+  "Anti-Drone Net Gun": 0.40
+  "Interceptor Drone": 0.60
+  "Countermeasures": 0.50
+  # Default
+  default_tier: 0.50
+
+# --- Stage 3: Decision Engine parameters ---
+decision_engine:
+  SMALL_GAP: 5        # percentage points — gap <= 5 → cost wins
+  LARGE_GAP: 15       # percentage points — gap > 15 → Pk wins outright
+  CRITICAL_PK: 70     # percentage — below this, Pk wins (ignore cost) for single selection
+  COMBO_TRIGGER_PK: 60  # percentage — below this, also search multi-weapon combinations
+  TARGET_PK: 85       # percentage — target P_combined for combination mode
+  alpha: 0.70         # Pk weight in weighted-score band
+  beta: 0.30          # cost weight in weighted-score band
+  max_combo_size: 3   # max weapons in a combo
+
+# --- CM classes to EXCLUDE (non-engagement items) ---
+excluded_cm_classes_patterns:
+  - "Radar"
+  - "Detection Sensor"
+  - "EO System"
+  - "Airborne Early Warning"
+  - "Ballistic Missile"
+  - "SLBM"
+  - "Guided Rocket"
+  - "Precision-Guided"
+  - "Anti-Radiation"
+  - "Air-to-Surface"
+  - "Hypersonic"
+  - "Cruise Missile"
+  - "Air-to-Air Missile"
